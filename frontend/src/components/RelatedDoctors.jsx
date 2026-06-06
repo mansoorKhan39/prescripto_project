@@ -8,18 +8,23 @@ const RelatedDoctors = ({ speciality, docId }) => {
 
   useEffect(() => {
     if (doctors.length > 0 && speciality) {
-      const doctorsData = doctors.filter((doc) => doc.speciality === speciality && doc._id !== docId)
-      setRelDocs(doctorsData)
+      setRelDocs(doctors.filter(doc => doc.speciality === speciality && doc._id !== docId))
     }
   }, [doctors, speciality, docId])
 
+  if (relDoc.length === 0) return null
+
   return (
-    <div className='flex flex-col items-center gap-4 my-16 text-[#262626]'>
-      <h1 className='text-3xl font-medium'>Related Doctors</h1>
-      <p className='sm:w-1/3 text-center text-sm'>Simply browse through our extensive list of trusted doctors.</p>
-      <div className='w-full grid grid-cols-auto gap-4 pt-5 gap-y-6 px-3 sm:px-0'>
-        {relDoc.slice(0, 5).map((item, index) => (
-          <DoctorCard key={index} item={item} />
+    <div className='py-12'>
+      <div className='text-center mb-10'>
+        <p className='text-primary text-sm font-semibold tracking-widest uppercase mb-2'>Same Speciality</p>
+        <h2 className='text-2xl font-bold text-gray-800'>Related Doctors</h2>
+      </div>
+      <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+        {relDoc.slice(0, 5).map((item, i) => (
+          <div key={item._id} style={{ animation: `fadeInUp 0.5s ease ${i*60}ms both` }}>
+            <DoctorCard item={item} />
+          </div>
         ))}
       </div>
     </div>

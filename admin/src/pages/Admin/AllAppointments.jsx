@@ -6,57 +6,65 @@ const AllAppointments = () => {
   const { aToken, appointments, getAllAppointments, cancelAppointment } = useContext(AdminContext)
   const { slotDateFormat, calculateAge, currency } = useContext(AppContext)
 
-  useEffect(() => {
-    if (aToken) {
-      getAllAppointments()
-    }
-  }, [aToken])
+  useEffect(() => { if (aToken) getAllAppointments() }, [aToken])
 
   return (
-    <div className='w-full max-w-6xl m-5'>
-      <p className='mb-3 text-lg font-medium'>All Appointments</p>
+    <div className='flex-1 p-6 bg-gray-50 min-h-screen'>
+      <div className='mb-6'>
+        <h1 className='text-2xl font-bold text-gray-800'>All Appointments</h1>
+        <p className='text-gray-400 text-sm mt-1'>{appointments.length} total appointments</p>
+      </div>
 
-      <div className='bg-white border rounded text-sm max-h-[80vh] overflow-y-scroll'>
-        <div className='hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b'>
-          <p>#</p>
-          <p>Patient</p>
-          <p>Age</p>
-          <p>Date & Time</p>
-          <p>Doctor</p>
-          <p>Fees</p>
-          <p>Action</p>
+      <div className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden'>
+        {/* Table Header */}
+        <div className='hidden md:grid grid-cols-[40px_2fr_60px_2fr_2fr_80px_100px] gap-3 px-6 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide'>
+          <p>#</p><p>Patient</p><p>Age</p><p>Date & Time</p><p>Doctor</p><p>Fees</p><p>Status</p>
         </div>
 
-        {appointments.map((item, index) => (
-          <div
-            className='flex flex-wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50'
-            key={index}
-          >
-            <p className='max-sm:hidden'>{index + 1}</p>
-            <div className='flex items-center gap-2'>
-              <img src={item.userData.image} className='w-8 rounded-full' alt='' />
-              <p>{item.userData.name}</p>
+        <div className='divide-y divide-gray-50 max-h-[70vh] overflow-y-auto'>
+          {appointments.map((item, i) => (
+            <div
+              key={item._id}
+              className='flex flex-wrap md:grid md:grid-cols-[40px_2fr_60px_2fr_2fr_80px_100px] gap-3 items-center px-6 py-4 hover:bg-gray-50 transition-colors'
+              style={{ animation: `fadeInUp 0.4s ease ${Math.min(i,10)*40}ms both` }}
+            >
+              <p className='hidden md:block text-xs text-gray-400 font-medium'>{i+1}</p>
+
+              <div className='flex items-center gap-3 min-w-0'>
+                <img src={item.userData.image} className='w-9 h-9 rounded-xl object-cover bg-gray-100 flex-shrink-0' alt='' />
+                <p className='text-sm font-medium text-gray-800 truncate'>{item.userData.name}</p>
+              </div>
+
+              <p className='hidden md:block text-sm text-gray-500'>{calculateAge(item.userData.dob)}</p>
+
+              <div>
+                <p className='text-sm text-gray-700'>{slotDateFormat(item.slotDate)}</p>
+                <p className='text-xs text-gray-400'>{item.slotTime}</p>
+              </div>
+
+              <div className='flex items-center gap-2 min-w-0'>
+                <img src={item.docData.image} className='w-8 h-8 rounded-lg object-cover bg-blue-50 flex-shrink-0' alt='' />
+                <p className='text-sm text-gray-700 truncate'>{item.docData.name}</p>
+              </div>
+
+              <p className='text-sm font-semibold text-gray-800'>{currency}{item.amount}</p>
+
+              <div>
+                {item.cancelled
+                  ? <span className='px-2.5 py-1 bg-red-50 text-red-400 rounded-full text-xs font-medium'>Cancelled</span>
+                  : item.isCompleted
+                    ? <span className='px-2.5 py-1 bg-green-50 text-green-500 rounded-full text-xs font-medium'>Completed</span>
+                    : <button
+                        onClick={() => cancelAppointment(item._id)}
+                        className='px-2.5 py-1 bg-red-50 text-red-400 rounded-full text-xs font-medium hover:bg-red-100 transition-colors'
+                      >
+                        Cancel
+                      </button>
+                }
+              </div>
             </div>
-            <p className='max-sm:hidden'>{calculateAge(item.userData.dob)}</p>
-            <p>{slotDateFormat(item.slotDate)}, {item.slotTime}</p>
-            <div className='flex items-center gap-2'>
-              <img src={item.docData.image} className='w-8 rounded-full bg-gray-200' alt='' />
-              <p>{item.docData.name}</p>
-            </div>
-            <p>{currency}{item.amount}</p>
-            {item.cancelled
-              ? <p className='text-red-400 text-xs font-medium'>Cancelled</p>
-              : item.isCompleted
-                ? <p className='text-green-500 text-xs font-medium'>Completed</p>
-                : <button
-                  onClick={() => cancelAppointment(item._id)}
-                  className='text-red-500 border border-red-500 rounded px-2 py-1 text-xs hover:bg-red-500 hover:text-white transition-all'
-                >
-                  Cancel
-                </button>
-            }
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )

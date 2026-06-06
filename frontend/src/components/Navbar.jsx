@@ -1,101 +1,176 @@
-import React, { useContext, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import React, { useContext, useState, useEffect } from 'react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
+import { assets } from '../assets/assets_frontend/assets'
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { token, setToken, userData } = useContext(AppContext)
   const [showMenu, setShowMenu] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const logout = () => {
     localStorage.removeItem('token')
     setToken(false)
+    setShowDropdown(false)
     navigate('/login')
   }
 
+  const navLinks = [
+    { to: '/', label: 'HOME' },
+    { to: '/doctors', label: 'ALL DOCTORS' },
+    { to: '/about', label: 'ABOUT' },
+    { to: '/contact', label: 'CONTACT' },
+  ]
+
   return (
-    <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-[#ADADAD]'>
-      {/* Logo */}
-      <div className='flex items-center gap-2 cursor-pointer' onClick={() => navigate('/')}>
-        <div className='w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
-          <span className='text-white font-bold text-lg'>P</span>
-        </div>
-        <span className='text-xl font-bold text-primary'>Prescripto</span>
-      </div>
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-blue-100/50' : 'bg-white'
+      }`}>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center justify-between h-16'>
 
-      {/* Desktop Nav */}
-      <ul className='hidden md:flex items-start gap-5 font-medium'>
-        <NavLink to='/'>
-          <li className='py-1'>HOME</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/doctors'>
-          <li className='py-1'>ALL DOCTORS</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/about'>
-          <li className='py-1'>ABOUT</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/contact'>
-          <li className='py-1'>CONTACT</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-      </ul>
+            {/* Logo */}
+            <div
+              onClick={() => navigate('/')}
+              className='flex items-center gap-2 cursor-pointer group'
+            >
+              <img
+                src={assets.logo}
+                alt='Prescripto'
+                className='h-9 w-auto transition-transform duration-300 group-hover:scale-105'
+              />
+            </div>
 
-      {/* Right Side */}
-      <div className='flex items-center gap-4'>
-        {token && userData
-          ? <div className='flex items-center gap-2 cursor-pointer group relative'>
-            <img className='w-8 rounded-full' src={userData.image} alt='' />
-            <img className='w-2.5' src='https://cdn-icons-png.flaticon.com/512/2985/2985150.png' alt='' />
-            <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
-              <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
-                <p onClick={() => navigate('my-profile')} className='hover:text-black cursor-pointer'>My Profile</p>
-                <p onClick={() => navigate('my-appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
-                <p onClick={logout} className='hover:text-black cursor-pointer'>Logout</p>
-              </div>
+            {/* Desktop Nav */}
+            <ul className='hidden md:flex items-center gap-8'>
+              {navLinks.map(link => (
+                <NavLink key={link.to} to={link.to} end={link.to === '/'}>
+                  {({ isActive }) => (
+                    <li className={`nav-link text-sm font-medium tracking-wide cursor-pointer transition-colors duration-200 ${
+                      isActive ? 'text-primary' : 'text-gray-600 hover:text-primary'
+                    } ${isActive ? 'active' : ''}`}>
+                      {link.label}
+                    </li>
+                  )}
+                </NavLink>
+              ))}
+            </ul>
+
+            {/* Right Side */}
+            <div className='flex items-center gap-4'>
+              {token && userData ? (
+                <div className='relative'>
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className='flex items-center gap-2 p-1 rounded-full hover:bg-gray-50 transition-all duration-200'
+                  >
+                    <img
+                      src={userData.image}
+                      alt=''
+                      className='w-9 h-9 rounded-full object-cover ring-2 ring-primary/30'
+                    />
+                    <img src={assets.dropdown_icon} alt='' className={`w-2.5 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {showDropdown && (
+                    <div className='absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl shadow-gray-200/80 border border-gray-100 py-2 animate-slideDown'>
+                      <div className='px-4 py-2 border-b border-gray-100'>
+                        <p className='text-sm font-semibold text-gray-800'>{userData.name}</p>
+                        <p className='text-xs text-gray-500'>{userData.email}</p>
+                      </div>
+                      {[
+                        { label: 'My Profile', icon: '👤', path: '/my-profile' },
+                        { label: 'My Appointments', icon: '📅', path: '/my-appointments' },
+                      ].map(item => (
+                        <button
+                          key={item.path}
+                          onClick={() => { navigate(item.path); setShowDropdown(false) }}
+                          className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-primary transition-colors'
+                        >
+                          <span>{item.icon}</span> {item.label}
+                        </button>
+                      ))}
+                      <div className='border-t border-gray-100 mt-1'>
+                        <button
+                          onClick={logout}
+                          className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors'
+                        >
+                          <span>🚪</span> Logout
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate('/login')}
+                  className='hidden md:flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 active:scale-95'
+                >
+                  Create Account
+                </button>
+              )}
+
+              {/* Mobile hamburger */}
+              <button
+                onClick={() => setShowMenu(true)}
+                className='md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors'
+              >
+                <img src={assets.menu_icon} alt='' className='w-5' />
+              </button>
             </div>
           </div>
-          : <button
-            onClick={() => navigate('/login')}
-            className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'
-          >
-            Create account
-          </button>
-        }
-
-        {/* Mobile menu icon */}
-        <div className='md:hidden cursor-pointer' onClick={() => setShowMenu(true)}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu */}
-      <div className={`md:hidden ${showMenu ? 'fixed w-full' : 'h-0 w-0'} right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
-        <div className='flex items-center justify-between px-5 py-6'>
-          <div className='flex items-center gap-2'>
-            <div className='w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
-              <span className='text-white font-bold text-lg'>P</span>
+      {/* Spacer */}
+      <div className='h-16'></div>
+
+      {/* Mobile Menu Overlay */}
+      {showMenu && (
+        <div className='fixed inset-0 z-50 md:hidden'>
+          <div className='absolute inset-0 bg-black/40 backdrop-blur-sm' onClick={() => setShowMenu(false)} />
+          <div className='absolute right-0 top-0 h-full w-72 bg-white shadow-2xl animate-fadeInRight'>
+            <div className='flex items-center justify-between p-5 border-b'>
+              <img src={assets.logo} alt='' className='h-8' />
+              <button onClick={() => setShowMenu(false)} className='p-2 rounded-full hover:bg-gray-100'>
+                <img src={assets.cross_icon} alt='' className='w-4' />
+              </button>
             </div>
-            <span className='text-xl font-bold text-primary'>Prescripto</span>
-          </div>
-          <div className='cursor-pointer' onClick={() => setShowMenu(false)}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <div className='p-5 flex flex-col gap-1'>
+              {navLinks.map(link => (
+                <NavLink key={link.to} to={link.to} onClick={() => setShowMenu(false)} end={link.to === '/'}>
+                  {({ isActive }) => (
+                    <div className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      isActive ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-50'
+                    }`}>
+                      {link.label}
+                    </div>
+                  )}
+                </NavLink>
+              ))}
+              {!token && (
+                <button
+                  onClick={() => { navigate('/login'); setShowMenu(false) }}
+                  className='mt-4 w-full bg-primary text-white py-3 rounded-xl text-sm font-medium'
+                >
+                  Create Account
+                </button>
+              )}
+            </div>
           </div>
         </div>
-        <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
-          <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded full inline-block'>HOME</p></NavLink>
-          <NavLink onClick={() => setShowMenu(false)} to='/doctors'><p className='px-4 py-2 rounded full inline-block'>ALL DOCTORS</p></NavLink>
-          <NavLink onClick={() => setShowMenu(false)} to='/about'><p className='px-4 py-2 rounded full inline-block'>ABOUT</p></NavLink>
-          <NavLink onClick={() => setShowMenu(false)} to='/contact'><p className='px-4 py-2 rounded full inline-block'>CONTACT</p></NavLink>
-        </ul>
-      </div>
-    </div>
+      )}
+    </>
   )
 }
 

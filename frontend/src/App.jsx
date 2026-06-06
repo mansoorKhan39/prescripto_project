@@ -2,10 +2,8 @@ import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-
 import Home from './pages/Home'
 import Doctors from './pages/Doctors'
 import Login from './pages/Login'
@@ -18,8 +16,8 @@ import Verify from './pages/Verify'
 
 const App = () => {
   return (
-    <div className='mx-4 sm:mx-[10%]'>
-      <ToastContainer />
+    <div className='min-h-screen bg-[#f8fafc]'>
+      <ToastContainer position='top-right' autoClose={3000} hideProgressBar={false} />
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />

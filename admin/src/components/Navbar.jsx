@@ -10,34 +10,26 @@ const Navbar = () => {
 
   const logout = () => {
     navigate('/')
-    if (aToken) {
-      setAToken('')
-      localStorage.removeItem('aToken')
-    }
-    if (dToken) {
-      setDToken('')
-      localStorage.removeItem('dToken')
-    }
+    if (aToken) { setAToken(''); localStorage.removeItem('aToken') }
+    if (dToken) { setDToken(''); localStorage.removeItem('dToken') }
   }
 
   return (
-    <div className='flex justify-between items-center px-4 sm:px-10 py-3 border-b bg-white'>
-      <div className='flex items-center gap-2 text-xs'>
-        <div className='flex items-center gap-2 cursor-pointer'>
-          <div className='w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
-            <span className='text-white font-bold text-lg'>P</span>
-          </div>
-          <span className='text-xl font-bold text-primary'>Prescripto</span>
+    <div className='flex justify-between items-center px-6 py-3 bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40'>
+      <div className='flex items-center gap-3'>
+        <div className='w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-md shadow-primary/30'>
+          <span className='text-white font-bold text-sm'>P</span>
         </div>
-        <p className='border px-2.5 py-0.5 rounded-full border-gray-500 text-gray-600'>
+        <span className='text-lg font-bold text-gray-800'>Prescripto</span>
+        <span className='bg-primary/10 text-primary text-xs font-semibold px-3 py-0.5 rounded-full'>
           {aToken ? 'Admin' : 'Doctor'}
-        </p>
+        </span>
       </div>
       <button
         onClick={logout}
-        className='bg-primary text-white text-sm px-10 py-2 rounded-full'
+        className='flex items-center gap-2 bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-600 text-sm font-medium px-5 py-2 rounded-full transition-all duration-200'
       >
-        Logout
+        <span>🚪</span> Logout
       </button>
     </div>
   )

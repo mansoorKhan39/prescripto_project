@@ -8,18 +8,24 @@ const DoctorCard = ({ item }) => {
 
   return (
     <div
-      onClick={() => { navigate(`/appointment/${item._id}`); scrollTo(0, 0) }}
-      className='border border-[#C9D8FF] rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
+      onClick={() => { navigate(`/appointment/${item._id}`); scrollTo(0,0) }}
+      className='bg-white rounded-2xl overflow-hidden cursor-pointer card-hover border border-gray-100 shadow-sm group'
     >
-      <img className='bg-[#EAEFFF] w-full' src={item.image} alt='' />
+      <div className='bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden'>
+        <img
+          src={item.image}
+          alt={item.name}
+          className='w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-500'
+        />
+      </div>
       <div className='p-4'>
-        <div className={`flex items-center gap-2 text-sm text-center ${item.available ? 'text-green-500' : 'text-gray-500'}`}>
-          <p className={`w-2 h-2 rounded-full ${item.available ? 'bg-green-500' : 'bg-gray-500'}`}></p>
-          <p>{item.available ? 'Available' : 'Not Available'}</p>
+        <div className={`flex items-center gap-1.5 text-xs font-medium mb-2 ${item.available ? 'text-green-500' : 'text-gray-400'}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${item.available ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></span>
+          {item.available ? 'Available' : 'Not Available'}
         </div>
-        <p className='text-[#262626] text-lg font-medium'>{item.name}</p>
-        <p className='text-[#5C5C5C] text-sm'>{item.speciality}</p>
-        <p className='text-primary text-sm mt-1'>{currencySymbol}{item.fees}</p>
+        <p className='text-gray-800 font-semibold text-sm leading-tight mb-0.5'>{item.name}</p>
+        <p className='text-gray-500 text-xs mb-2'>{item.speciality}</p>
+        <p className='text-primary text-xs font-semibold'>{currencySymbol}{item.fees} <span className='text-gray-400 font-normal'>/ visit</span></p>
       </div>
     </div>
   )
